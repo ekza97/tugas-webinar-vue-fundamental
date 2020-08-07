@@ -1,0 +1,41 @@
+/* 
+Generic Styling, for Desktops/Laptops 
+*/
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 15px;
+}
+
+/* Zebra striping */
+tr:nth-of-type(odd) {
+    background: #eee;
+}
+
+th {
+    background: #333;
+    color: white;
+    font-weight: bold;
+}
+
+td,
+th {
+    padding: 6px;
+    border: 1px solid #ccc;
+    text-align: left;
+}
+
+.pagination-left {
+    width: 80%;
+    float: left;
+}
+
+.pagination-right {
+    margin-left: auto;
+}
+
+.form-input {
+    width: 98%;
+    padding: 5px;
+    margin: 5px;
+}

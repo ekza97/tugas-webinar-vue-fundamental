@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vue JS Application</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div id="app">
+        <!-- <input type="text" v-model="url"> -->
+        <div>
+            <input class="form-input" type="text" v-model="katakunci" placeholder="Ketikkan kata pencarian di sini"
+                autofocus>
+            <!-- <button @click="bersihkan">Bersihkan</button> -->
+        </div>
+        <div>
+
+        </div>
+        <p></p>
+        <!-- <div v-for="(hasil,indeks) in daftarHasil" :key="indeks">
+            <h5 v-html="hasil.text"></h5>
+            <a :href="url+'&t='+hasil.start+'s'" target="_blank">Tonton Video</a>
+        </div> -->
+        <table border="0">
+            <thead>
+                <th>Judul Video</th>
+                <th>#</th>
+            </thead>
+            <tbody>
+                <tr v-for="(hasil,indeks) in daftarHasil" :key="indeks">
+                    <td v-html="hasil.text"></td>
+                    <td>
+                        <a :href="url+'&t='+hasil.start+'s'" target="_blank">Watch</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="pagination">
+            <div class="pagination-left">
+                Total Hasil : <b>{{paginasi.total}}</b> data
+            </div>
+            <div class="pagination-right">
+                <button @click="firstKlik" :disabled="!paginasi.first" class="pertama">First</button>
+                <button @click="prevKlik" :disabled="!paginasi.prev" class="sebelumnya">Prev</button>
+                <button>{{paginasi.page}}</button>
+                <button @click="nextKlik" :disabled="!paginasi.next" class="selanjutnya">Next</button>
+                <button @click="lastKlik" :disabled="!paginasi.last" class="terakhir">Last</button>
+            </div>
+        </div>
+        <!-- <pre>{{stringPaginasi}}</pre>
+        <pre>{{stringDaftarHasil}}</pre> -->
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="index.js"></script>
+    <script>
+        new Vue({
+            el: '#app',
+            data: {
+                url: 'https://www.youtube.com/watch?v=klnvttPfOUM',
+                katakunci: '',
+                daftarHasil: [],
+                paginasi: {
+                    first: null,
+                    last: null,
+                    prev: null,
+                    next: null,
+                    total: 0,
+                    page: 0
+                }
+            },
+            computed: {
+                // stringDaftarHasil() {
+                //     return (param) => {
+                //         return JSON.stringify(param, null, 2)
+                //     }
+                // },
+                stringPaginasi() {
+                    return JSON.stringify(this.paginasi, null, 2)
+                },
+                stringDaftarHasil() {
+                    return JSON.stringify(this.daftarHasil, null, 2)
+                }
+            },
+            watch: {
+                // katakunci(katakunci) {
+                //     console.log(katakunci)
+                // }
+                katakunci: pDebounce(function katakunci(katakunci) {
+                    this.cari(katakunci, this.url)
+                }, 250)
+            },
+            methods: {
+                async cari(katakunci, url, paginasi) {
+                    let urlApi =
+                        `https://cari-teks-video-api.vercel.app/api/search?q=${katakunci}&url=${encodeURIComponent(url)}`
+                    if (paginasi) {
+                        urlApi = paginasi
+                    }
+                    const respon = await fetch(urlApi).then(_respon => {
+                        if (_respon.ok) {
+                            return _respon.json()
+                        }
+                        return []
+                    })
+                    this.daftarHasil = respon.data
+                    this.paginasi.first = respon.first
+                    this.paginasi.prev = respon.prev
+                    this.paginasi.next = respon.next
+                    this.paginasi.last = respon.last
+                    this.paginasi.total = respon.total
+                    this.paginasi.page = respon.page
+                },
+                bersihkan() {
+
+                },
+                firstKlik() {
+                    this.cari(this.katakunci, this.url, this.paginasi.first)
+                },
+                prevKlik() {
+                    this.cari(this.katakunci, this.url, this.paginasi.prev)
+                },
+                nextKlik() {
+                    this.cari(this.katakunci, this.url, this.paginasi.next)
+                },
+                lastKlik() {
+                    this.cari(this.katakunci, this.url, this.paginasi.last)
+                }
+            }
+        })
+    </script>
+</body>
+
+</html>
